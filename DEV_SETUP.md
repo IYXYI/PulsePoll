@@ -26,6 +26,8 @@ wrangler kv:namespace create "POLLS"
 - CF_KV_NAMESPACE_ID: the KV namespace id created above
 - (Optionally) VITE_API_URL: the published worker URL; the combined workflow injects it automatically after worker publish
 
+Note: newer Wrangler/Cloudflare actions expect the secret name `CLOUDFLARE_API_TOKEN`. The workflows accept either `CLOUDFLARE_API_TOKEN` or the older `CF_API_TOKEN`. Prefer adding `CLOUDFLARE_API_TOKEN`.
+
 4) Local development
 
 - Frontend:
