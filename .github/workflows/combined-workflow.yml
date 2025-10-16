@@ -12,7 +12,7 @@ jobs:
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
-          node-version: 18
+          node-version: 20
 
       - name: Install wrangler
         run: npm i -g wrangler@4
@@ -24,7 +24,8 @@ jobs:
         run: |
           cd wrangler
           wrangler deploy --env production | tee publish-output.txt
-          URL=$(grep -oE "https?://[^"]+workers.dev" publish-output.txt | head -n1 || true)
+          URL=$(grep -oE 'https?://[^"']+workers.dev' publish-output.txt | head -n1 || true)
+          echo "worker_url=$URL" >> $GITHUB_OUTPUT
           echo "worker_url=$URL" >> $GITHUB_OUTPUT
 
       - name: Install frontend deps

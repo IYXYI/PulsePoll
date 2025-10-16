@@ -12,7 +12,7 @@ jobs:
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
-          node-version: 18
+          node-version: 20
 
       - name: Install vercel CLI
         run: npm i -g vercel@28 || true
@@ -35,7 +35,7 @@ jobs:
           if [ -n "$VERCEL_PROJECT_ID" ]; then CMD+=(--project "$VERCEL_PROJECT_ID"); fi
           "${CMD[@]}" | tee vercel-out.txt
           # extract the deployed URL
-          URL=$(grep -oE "https?://[^"]+vercel.app" vercel-out.txt | head -n1 || true)
+          URL=$(grep -oE 'https?://[^"']+vercel.app' vercel-out.txt | head -n1 || true)
           echo "api_url=$URL" >> $GITHUB_OUTPUT
 
       - name: Build frontend

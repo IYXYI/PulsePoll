@@ -12,7 +12,7 @@ jobs:
       - name: Use Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: 18
+          node-version: 20
 
       - name: Install wrangler
         run: npm i -g wrangler@4
@@ -25,7 +25,7 @@ jobs:
           cd wrangler
           wrangler deploy --env production | tee publish-output.txt
           # Extract the workers.dev URL for later use
-          grep -oE "https?://[^"]+workers.dev" publish-output.txt || true
+          grep -oE 'https?://[^"']+workers.dev' publish-output.txt || true
 
       - name: Upload publish output
         uses: actions/upload-artifact@v4
