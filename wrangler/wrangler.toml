@@ -1,0 +1,8 @@
+name = "pulsepoll-worker"
+main = "src/index.js"
+compatibility_date = "2025-10-16"
+account_id = "<YOUR_CF_ACCOUNT_ID>"
+
+[[kv_namespaces]]
+binding = "POLLS"
+id = "<YOUR_CF_KV_NAMESPACE_ID>"

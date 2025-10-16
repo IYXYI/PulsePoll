@@ -1,0 +1,17 @@
+{
+  "name": "pulsepoll-worker",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "start": "wrangler dev",
+    "build": "echo 'worker has single file, nothing to build'",
+    "test": "node --test test/worker.test.js"
+  },
+  "devDependencies": {
+    "@miniflare/core": "^4.0.0",
+    "node-fetch": "^3.0.0",
+    "wrangler": "^3.0.0",
+    "uuid": "^9.0.0"
+  }
+}

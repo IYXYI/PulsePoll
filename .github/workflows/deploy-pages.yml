@@ -1,0 +1,52 @@
+name: Deploy Pages
+
+on:
+  push:
+    branches: [ main ]
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 18
+
+      - name: Get published worker URL (artifact)
+        uses: actions/download-artifact@v4
+        with:
+          name: worker-publish-output
+          path: ./artifacts || true
+
+      - name: Read worker URL
+        id: worker_url
+        run: |
+          if [ -f ./artifacts/wrangler/publish-output.txt ]; then
+            URL=$(grep -oE "https?://[^"]+workers.dev" ./artifacts/wrangler/publish-output.txt | head -n1 || true)
+            echo "worker_url=$URL"
+            echo "worker_url=$URL" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Install frontend deps
+        run: |
+          cd frontend
+          npm ci
+
+      - name: Build frontend
+        env:
+          VITE_API_URL: ${{ steps.worker_url.outputs.worker_url }}
+        run: |
+          cd frontend
+          VITE_API_URL="$VITE_API_URL" npm run build
+
+      - name: Deploy to GitHub Pages
+        uses: peaceiris/actions-gh-pages@v4
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./frontend/dist
+
+      - name: Smoke test Pages
+        run: |
+          echo "Manual smoke tests can be added here."

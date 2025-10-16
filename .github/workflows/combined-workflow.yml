@@ -1,0 +1,51 @@
+name: Publish Worker + Deploy Pages
+
+on:
+  push:
+    branches: [ main ]
+
+jobs:
+  build_and_deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 18
+
+      - name: Install wrangler
+        run: npm i -g wrangler@3
+
+      - name: Publish worker and capture URL
+        id: publish
+        env:
+          CF_API_TOKEN: ${{ secrets.CF_API_TOKEN }}
+        run: |
+          cd wrangler
+          wrangler publish --env production | tee publish-output.txt
+          URL=$(grep -oE "https?://[^"]+workers.dev" publish-output.txt | head -n1 || true)
+          echo "worker_url=$URL" >> $GITHUB_OUTPUT
+
+      - name: Install frontend deps
+        run: |
+          cd frontend
+          npm ci
+
+      - name: Build frontend with worker URL
+        env:
+          VITE_API_URL: ${{ steps.publish.outputs.worker_url }}
+        run: |
+          cd frontend
+          VITE_API_URL="$VITE_API_URL" npm run build
+
+      - name: Deploy to GitHub Pages
+        uses: peaceiris/actions-gh-pages@v4
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./frontend/dist
+
+      - name: Smoke test
+        run: |
+          echo "Worker URL: ${{ steps.publish.outputs.worker_url }}"
+          curl -fsS "${{ steps.publish.outputs.worker_url }}/status" || (echo 'Status check failed' && exit 1)

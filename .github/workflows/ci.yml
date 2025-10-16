@@ -1,0 +1,43 @@
+name: CI
+
+on: [push, pull_request]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        node-version: [18.x]
+
+    steps:
+      - uses: actions/checkout@v4
+      - name: Use Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node-version }}
+
+      - name: Install frontend deps
+        run: |
+          cd frontend
+          npm ci
+
+      - name: Run frontend tests + lint
+        run: |
+          cd frontend
+          npm test
+          npm run lint
+
+      - name: Install worker deps
+        run: |
+          cd wrangler
+          npm ci
+
+      - name: Run worker tests
+        run: |
+          cd wrangler
+          npm test
+
+      - name: Build frontend (check)
+        run: |
+          cd frontend
+          VITE_API_URL="http://localhost:8787" npm run build

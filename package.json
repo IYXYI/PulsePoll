@@ -1,0 +1,9 @@
+{
+  "name": "pulsepoll",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "install:all": "(cd frontend && npm install) && (cd wrangler && npm install)",
+    "test:all": "(cd frontend && npm test) && (cd wrangler && npm test)"
+  }
+}
