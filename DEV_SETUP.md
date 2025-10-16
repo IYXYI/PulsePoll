@@ -28,6 +28,13 @@ wrangler kv:namespace create "POLLS"
 
 Note: newer Wrangler/Cloudflare actions expect the secret name `CLOUDFLARE_API_TOKEN`. The workflows accept either `CLOUDFLARE_API_TOKEN` or the older `CF_API_TOKEN`. Prefer adding `CLOUDFLARE_API_TOKEN`.
 
+If you choose Vercel + Upstash instead of Cloudflare Worker, add these secrets instead:
+
+- VERCEL_TOKEN: your Vercel personal token
+- VERCEL_ORG_ID and VERCEL_PROJECT_ID: optional identifiers for your Vercel project (recommended for non-interactive deploys)
+- UPSTASH_REDIS_REST_URL and UPSTASH_REDIS_REST_TOKEN: credentials for Upstash Redis instance
+
+
 4) Local development
 
 - Frontend:

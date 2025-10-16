@@ -1,0 +1,10 @@
+{
+  "name": "pulsepoll-vercel-api",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "dependencies": {
+    "@upstash/redis": "^1.19.0",
+    "uuid": "^9.0.0"
+  }
+}

@@ -1,0 +1,54 @@
+name: Deploy Vercel API + Pages
+
+on:
+  push:
+    branches: [ main ]
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 18
+
+      - name: Install vercel CLI
+        run: npm i -g vercel@28 || true
+
+      - name: Deploy API to Vercel
+        id: vercel
+        env:
+          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+          VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+          VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
+          UPSTASH_REDIS_REST_URL: ${{ secrets.UPSTASH_REDIS_REST_URL }}
+          UPSTASH_REDIS_REST_TOKEN: ${{ secrets.UPSTASH_REDIS_REST_TOKEN }}
+        run: |
+          # deploy the vercel api directory
+          cd vercel-api
+          # Use vercel deploy --prebuilt and --token for non-interactive deploy
+          vercel deploy --prod --token "$VERCEL_TOKEN" --confirm --name pulsepoll-api --build-command "" --org "$VERCEL_ORG_ID" --project "$VERCEL_PROJECT_ID" | tee vercel-out.txt
+          # extract the deployed URL
+          URL=$(grep -oE "https?://[^"]+vercel.app" vercel-out.txt | head -n1 || true)
+          echo "api_url=$URL" >> $GITHUB_OUTPUT
+
+      - name: Build frontend
+        env:
+          VITE_API_URL: ${{ steps.vercel.outputs.api_url }}
+        run: |
+          cd frontend
+          npm ci
+          VITE_API_URL="$VITE_API_URL" npm run build
+
+      - name: Deploy to GitHub Pages
+        uses: peaceiris/actions-gh-pages@v4
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./frontend/dist
+
+      - name: Smoke test
+        run: |
+          echo "API URL: ${{ steps.vercel.outputs.api_url }}"
+          curl -fsS "${{ steps.vercel.outputs.api_url }}/api/status" || (echo 'Status check failed' && exit 1)
