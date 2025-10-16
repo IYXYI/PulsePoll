@@ -29,7 +29,11 @@ jobs:
           # deploy the vercel api directory
           cd vercel-api
           # Use vercel deploy --prebuilt and --token for non-interactive deploy
-          vercel deploy --prod --token "$VERCEL_TOKEN" --confirm --name pulsepoll-api --build-command "" --org "$VERCEL_ORG_ID" --project "$VERCEL_PROJECT_ID" | tee vercel-out.txt
+          # Build the deploy command dynamically so we don't require org/project IDs
+          CMD=(vercel deploy --prod --token "$VERCEL_TOKEN" --confirm --name pulsepoll-api --build-command "")
+          if [ -n "$VERCEL_ORG_ID" ]; then CMD+=(--org "$VERCEL_ORG_ID"); fi
+          if [ -n "$VERCEL_PROJECT_ID" ]; then CMD+=(--project "$VERCEL_PROJECT_ID"); fi
+          "${CMD[@]}" | tee vercel-out.txt
           # extract the deployed URL
           URL=$(grep -oE "https?://[^"]+vercel.app" vercel-out.txt | head -n1 || true)
           echo "api_url=$URL" >> $GITHUB_OUTPUT
