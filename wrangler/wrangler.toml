@@ -6,3 +6,10 @@ account_id = "<YOUR_CF_ACCOUNT_ID>"
 [[kv_namespaces]]
 binding = "POLLS"
 id = "<YOUR_CF_KV_NAMESPACE_ID>"
+
+[env.production]
+account_id = "<YOUR_CF_ACCOUNT_ID>"
+
+[[env.production.kv_namespaces]]
+binding = "POLLS"
+id = "<YOUR_CF_KV_NAMESPACE_ID>"
